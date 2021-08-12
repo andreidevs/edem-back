@@ -1,44 +1,50 @@
-import { Types } from 'mongoose';
+import { StudentModel } from '../students/student.model';
 import { ApiProperty } from '@nestjs/swagger';
-import { GroupTypes } from '../group.model';
-import { IsArray, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { prop, Ref } from '@typegoose/typegoose';
+import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
+import { Types } from 'mongoose';
+import { UserModel } from 'src/user/user.model';
 
-export class CreateGroupDto {
+export enum GroupTypes {
+    Group = "Группа",
+    Mini = "Минигруппа"
+}
+export interface GroupModel extends Base { }
+export class GroupModel extends TimeStamps {
 
     @ApiProperty({ example: "Пн. Ср, Пт 18.00 София", description: "Название группы, создается на фронте , дни недели + время + тренер" })
-    @IsString()
+    @prop()
     name: string;
 
     @ApiProperty({ example: "19.00", description: "Время. Справочник на фронте" })
-    @IsString()
+    @prop()
     time: string;
 
 
     @ApiProperty({ example: "id model<UserModel>", description: "User = Тренер который проводит данную группу" })
-    @IsString()
-    @IsOptional()
-    user: string;
+    @prop({ ref: () => UserModel })
+    user: Ref<UserModel>
 
 
     @ApiProperty({ example: "Пн, Ср, Пт", description: "Массив с днями неделями" })
-    @IsArray()
-    @IsString({ each: true })
+    @prop({ type: () => [String] })
     weekDays: string[];
 
 
     @ApiProperty({ example: "array of model<StudentModel>", description: "Ученики группы" })
-    @IsArray()
-    @IsString({ each: true })
-    students: Types.ObjectId[];
+    @prop({ ref: () => StudentModel })
+    students: Ref<StudentModel>[]
 
 
     @ApiProperty({ example: "10", description: "Кол-во мест в группе" })
-    @IsNumber()
+    @prop({ default: 12 })
     count: number;
 
 
     @ApiProperty({ example: "Группа", description: "Тип группы ENUM (Группа, Минигруппа)" })
-    @IsEnum(GroupTypes)
+    @prop({ enum: GroupTypes })
     type: GroupTypes;
+
+
 
 }

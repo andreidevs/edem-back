@@ -7,9 +7,11 @@ import { setupAdminPanel } from './admin-panel/admin-panel.plugin';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationException } from './filters/validation.exception';
 import { ValidationFilter } from './filters/validation.filter';
+import * as compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
 
   // SWAGGER
   const config = new DocumentBuilder()
@@ -48,6 +50,8 @@ async function bootstrap() {
 
   // CORS
   app.enableCors();
+
+
 
   // ADMIN PANEL
   await setupAdminPanel(app);

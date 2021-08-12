@@ -12,7 +12,7 @@ export class UserService {
 
     async setRole(dto: CreateRoleDto) {
         const roleArray = new Array(new Types.ObjectId(dto.role))
-        return this.userModel.findOneAndUpdate(
+        return await this.userModel.findOneAndUpdate(
             { _id: dto.userId },
 
 
@@ -25,7 +25,7 @@ export class UserService {
 
 
     async getAllUsers() {
-        return this.userModel.aggregate([{
+        return await this.userModel.aggregate([{
             $lookup:
             {
                 from: 'Roles',  // Название коллекции
@@ -38,7 +38,7 @@ export class UserService {
     }
 
     async getUserById(id: string) {
-        return this.userModel.aggregate(
+        return await this.userModel.aggregate(
             [
                 { $match: { _id: new Types.ObjectId(id) } },
                 {
@@ -54,5 +54,10 @@ export class UserService {
                 }
             ]
         )
+    }
+
+
+    async delete(id: string) {
+        return this.userModel.findByIdAndDelete(id).exec()
     }
 }

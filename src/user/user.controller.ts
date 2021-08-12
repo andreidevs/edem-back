@@ -1,7 +1,7 @@
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { IdValidationPipe } from './../pipes/id-validation.pipe';
-import { Controller, forwardRef, Get, Inject, NotFoundException, Param, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, forwardRef, Get, Inject, NotFoundException, Param, Post, Body, UsePipes, ValidationPipe, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserModel } from './user.model';
 
@@ -33,6 +33,17 @@ export class UserController {
     @Get(':id')
     async getUserById(@Param('id', IdValidationPipe) id: string) {
         const user = await this.userService.getUserById(id)
+        if (!user) {
+            throw new NotFoundException('Пользователь не найден')
+        }
+        return user;
+    }
+
+
+    @ApiOperation({ summary: "Удалить пользователя" })
+    @Delete(':id')
+    async deleteUser(@Param('id', IdValidationPipe) id: string) {
+        const user = await this.userService.delete(id)
         if (!user) {
             throw new NotFoundException('Пользователь не найден')
         }

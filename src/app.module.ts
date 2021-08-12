@@ -9,6 +9,8 @@ import { RolesModule } from './roles/roles.module';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { GroupsModule } from './groups/groups.module';
+import { DailyModule } from './daily/daily.module';
+import { StudentsModule } from './students/students.module';
 
 
 
@@ -24,6 +26,8 @@ import { GroupsModule } from './groups/groups.module';
     RolesModule,
     UserModule,
     GroupsModule,
+    DailyModule,
+    StudentsModule,
 
   ],
   controllers: [AppController, UserController],
