@@ -1,26 +1,35 @@
+import { ModelType } from '@typegoose/typegoose/lib/types';
+import { StudentModel } from './student.model';
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from 'nestjs-typegoose';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
 @Injectable()
 export class StudentsService {
-  create(createStudentDto: CreateStudentDto) {
-    return 'This action adds a new student';
+  constructor(@InjectModel(StudentModel) private readonly studentModel: ModelType<StudentModel>) { }
+
+  async create(createStudentDto: CreateStudentDto) {
+    return this.studentModel.create(createStudentDto)
   }
 
-  findAll() {
-    return `This action returns all students`;
+
+  async getAll() {
+    return this.studentModel.find()
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} student`;
+  async getById(id: string) {
+    return this.studentModel.findById(id).exec()
   }
 
-  update(id: number, updateStudentDto: UpdateStudentDto) {
-    return `This action updates a #${id} student`;
+  async update(id: string, dto: UpdateStudentDto) {
+    return this.studentModel.findByIdAndUpdate(id, dto, { new: true }).exec()
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} student`;
+  async remove(id: string) {
+    return this.studentModel.findByIdAndDelete(id).exec()
   }
+
+
+
 }

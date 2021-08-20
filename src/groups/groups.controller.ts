@@ -40,6 +40,16 @@ export class GroupsController {
 
     }
 
+    @Get('/getByTypeFromUser/:type/:userid')
+    async getByTypeFromUser(@Param('type') type: GroupTypes, @Param('userid', IdValidationPipe) userid: string) {
+        if (Object.values(GroupTypes).includes(type)) {
+            return this.groupService.getByTypeFromUser(type, userid)
+        } else {
+            return new BadRequestException('Не верный тип группы')
+        }
+
+    }
+
     @UseGuards(JwtAuthGuard)
     @Post('/')
     async createGroup(@Body() dto: CreateGroupDto, @User() user: string) {

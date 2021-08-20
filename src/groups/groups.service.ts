@@ -16,25 +16,29 @@ export class GroupsService {
 
 
     async getAll() {
-        return await this.groupModel.find().populate('user').exec()
+        return this.groupModel.find().populate('user').exec()
     }
 
 
     async getById(id: string) {
-        return await this.groupModel.findById(id).populate('user').exec()
+        return this.groupModel.findById(id).populate('user').exec()
     }
 
     async getByType(type: GroupTypes) {
-        return await this.groupModel.find({ type }).populate('user').exec()
+        return this.groupModel.find({ type }).populate('user').exec()
+    }
+
+    async getByTypeFromUser(type: GroupTypes, userid: string) {
+        return this.groupModel.find({ type, user: userid }).populate('user').exec()
     }
 
 
     async updateGroup(id: string, dto: CreateGroupDto) {
-        return await this.groupModel.findByIdAndUpdate(id, dto, { new: true }).populate('user').exec()
+        return this.groupModel.findByIdAndUpdate(id, dto, { new: true }).populate('user').exec()
     }
 
     async deleteGroup(id: string) {
-        return await this.groupModel.findByIdAndDelete(id).exec()
+        return this.groupModel.findByIdAndDelete(id).exec()
     }
 
 }

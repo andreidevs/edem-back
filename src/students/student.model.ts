@@ -39,11 +39,14 @@ export class StudentModel extends TimeStamps {
     subscription: number;
 
 
-    @ApiProperty({ example: "12000", description: "Стоимость абонимента" })
+    @ApiProperty({ example: "false", description: "Разовое занятие" })
     @prop({ default: false })
     single: boolean;
 
 
+    @ApiProperty({ example: "false", description: "Активный" })
+    @prop({ default: true })
+    active: boolean;
 
 
 
