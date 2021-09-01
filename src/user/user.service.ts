@@ -7,57 +7,29 @@ import { Types } from 'mongoose';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(UserModel) private readonly userModel: ModelType<UserModel>) { }
+  constructor(
+    @InjectModel(UserModel) private readonly userModel: ModelType<UserModel>,
+  ) {}
 
+  async setRole(dto: CreateRoleDto) {
+    return await this.userModel.findOneAndUpdate(
+      { _id: dto.userId },
 
-    async setRole(dto: CreateRoleDto) {
-        const roleArray = new Array(new Types.ObjectId(dto.role))
-        return await this.userModel.findOneAndUpdate(
-            { _id: dto.userId },
+      { $addToSet: { roles: dto.role } },
 
+      { returnOriginal: false },
+    );
+  }
 
-            { $addToSet: { roles: new Types.ObjectId(dto.role) } },
+  async getAllUsers() {
+    return await this.userModel.find();
+  }
 
+  async getUserById(id: string) {
+    return await this.userModel.findById(id);
+  }
 
-            { returnOriginal: false }
-        )
-    }
-
-
-    async getAllUsers() {
-        return await this.userModel.aggregate([{
-            $lookup:
-            {
-                from: 'Roles',  // Название коллекции
-                localField: 'roles', // Какое поле берем из основнйо коллекции
-                foreignField: '_id', // По какому находим 
-                as: 'roles' // Куда записываем
-            }
-        }])
-
-    }
-
-    async getUserById(id: string) {
-        return await this.userModel.aggregate(
-            [
-                { $match: { _id: new Types.ObjectId(id) } },
-                {
-
-
-                    $lookup:
-                    {
-                        from: 'Roles',  // Название коллекции
-                        localField: 'roles', // Какое поле берем из основнйо коллекции
-                        foreignField: '_id', // По какому находим 
-                        as: 'roles' // Куда записываем
-                    }
-                }
-            ]
-        )
-    }
-
-
-    async delete(id: string) {
-        return this.userModel.findByIdAndDelete(id).exec()
-    }
+  async delete(id: string) {
+    return this.userModel.findByIdAndDelete(id).exec();
+  }
 }

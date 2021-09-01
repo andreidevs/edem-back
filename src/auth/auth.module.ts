@@ -10,7 +10,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStratagy } from './strategies/jwt.stratagy';
 
-
 @Module({
   controllers: [AuthController],
   imports: [
@@ -18,19 +17,19 @@ import { JwtStratagy } from './strategies/jwt.stratagy';
       {
         typegooseClass: UserModel,
         schemaOptions: {
-          collection: 'User'
-        }
-      }
+          collection: 'User',
+        },
+      },
     ]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: getJWTConfig
+      useFactory: getJWTConfig,
     }),
-    PassportModule
+    PassportModule,
   ],
   providers: [AuthService, JwtStratagy],
-  exports: [AuthService]
+  exports: [AuthService, JwtModule],
 })
-export class AuthModule { }
+export class AuthModule {}

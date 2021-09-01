@@ -1,5 +1,4 @@
 import { AuthModule } from './../auth/auth.module';
-import { AuthService } from './../auth/auth.service';
 import { GroupModel } from './group.model';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { Module } from '@nestjs/common';
@@ -12,13 +11,14 @@ import { GroupsService } from './groups.service';
       {
         typegooseClass: GroupModel,
         schemaOptions: {
-          collection: 'Groups'
-        }
-      }
+          collection: 'Groups',
+        },
+      },
     ]),
-    AuthModule
+    AuthModule,
   ],
   controllers: [GroupsController],
-  providers: [GroupsService]
+  providers: [GroupsService],
+  exports: [GroupsService],
 })
-export class GroupsModule { }
+export class GroupsModule {}
