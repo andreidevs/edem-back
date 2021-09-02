@@ -13,11 +13,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
+  Query,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { User } from 'src/decorators/user.decorator';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @ApiTags('Ученики групп')
 @Controller('students')
@@ -35,19 +38,27 @@ export class StudentsController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAll(@User() u: string) {
-    // const user = await this.authService.findUser(u);
+  async getAll(@Query('single') single: boolean, @User() user: UserModel) {
+    if (!single) {
+      single = false;
+    } else {
+      single = true;
+    }
 
-    return this.studentsService.getAll();
+    if (this.authService.checkRole('admin', user))
+      return this.studentsService.getAll(single);
 
-    // return this.studentsService.getAllFromUser(user._id);
+    return this.studentsService.getAllFromUser(
+      new Types.ObjectId(user.id),
+      single,
+    );
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/user')
-  async getFromUser(@User() user: UserModel) {
-    return this.studentsService.getAllFromUser(new Types.ObjectId(user.id));
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get('/user')
+  // async getFromUser(@User() user: UserModel) {
+  //   return this.studentsService.getAllFromUser(new Types.ObjectId(user.id));
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
@@ -68,5 +79,17 @@ export class StudentsController {
   @Delete(':id')
   async remove(@Param('id', IdValidationPipe) id: string) {
     return this.studentsService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('/paid/:id')
+  async paid(@Param('id', IdValidationPipe) id: string) {
+    return this.studentsService.paid(id);
+  }
+
+  @Cron(CronExpression.EVERY_12_HOURS)
+  async checkAndSetAutoPaid() {
+    this.studentsService.checkAndSetAutoPaid();
   }
 }

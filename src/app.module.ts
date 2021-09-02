@@ -11,16 +11,17 @@ import { UserModule } from './user/user.module';
 import { GroupsModule } from './groups/groups.module';
 import { DailyModule } from './daily/daily.module';
 import { StudentsModule } from './students/students.module';
-
-
+import { ScheduleModule } from '@nestjs/schedule';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: getMongoConfig
+      useFactory: getMongoConfig,
     }),
     AuthModule,
     RolesModule,
@@ -28,9 +29,9 @@ import { StudentsModule } from './students/students.module';
     GroupsModule,
     DailyModule,
     StudentsModule,
-
+    PaymentsModule,
   ],
   controllers: [AppController, UserController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

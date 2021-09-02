@@ -1,3 +1,4 @@
+import { PaymentsModule } from './../payments/payments.module';
 import { AuthModule } from './../auth/auth.module';
 import { StudentModel } from './student.model';
 import { TypegooseModule } from 'nestjs-typegoose';
@@ -18,6 +19,7 @@ import { GroupsModule } from 'src/groups/groups.module';
     ]),
     GroupsModule,
     AuthModule,
+    PaymentsModule,
   ],
   controllers: [StudentsController],
   providers: [StudentsService],

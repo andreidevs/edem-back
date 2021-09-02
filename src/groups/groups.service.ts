@@ -42,7 +42,7 @@ export class GroupsService {
     return this.groupModel.findByIdAndDelete(id).exec();
   }
 
-  async setCount(val: number, id: string, student: Types.ObjectId) {
+  async setStudentToGroup(val: number, id: string, student: Types.ObjectId) {
     const up = await this.groupModel
       .findByIdAndUpdate(
         id,

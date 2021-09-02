@@ -7,6 +7,7 @@ import { Injectable, Param, Post, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/decorators/user.decorator';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +45,14 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  checkRole(role: string, user: UserModel): Boolean {
+    let requiredRoles = [role];
+
+    if (user.roles.some((role: string) => requiredRoles.includes(role)))
+      return true;
+    return false;
   }
 
   async login(email: string, password: string) {
