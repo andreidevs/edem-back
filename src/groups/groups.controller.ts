@@ -33,10 +33,9 @@ export class GroupsController {
     private readonly authService: AuthService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get('/')
-  async getAllGroups() {
-    return this.groupService.getAll();
+  async getAllGroups(@Param('type') type: GroupTypes) {
+    return this.groupService.getByType(type);
   }
 
   @Get('/:id')
@@ -44,10 +43,15 @@ export class GroupsController {
     return this.groupService.getById(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getByType/:type')
-  async getByType(@Param('type') type: GroupTypes) {
+  async getByType(@Param('type') type: GroupTypes, @User() user: UserModel) {
     if (Object.values(GroupTypes).includes(type)) {
-      return this.groupService.getByType(type);
+      if (this.authService.checkRole('admin', user))
+        return this.groupService.getByType(type);
+
+      const userid = user.id;
+      return this.groupService.getByTypeFromUser(type, userid);
     } else {
       return new BadRequestException('Не верный тип группы');
     }

@@ -2,13 +2,22 @@ import { Types } from 'mongoose';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { GroupModel, GroupTypes } from './group.model';
-import { Injectable, Body, BadGatewayException } from '@nestjs/common';
+import {
+  Injectable,
+  Body,
+  BadGatewayException,
+  forwardRef,
+  Inject,
+} from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
+import { StudentsService } from 'src/students/students.service';
 
 @Injectable()
 export class GroupsService {
   constructor(
     @InjectModel(GroupModel) private readonly groupModel: ModelType<GroupModel>,
+    @Inject(forwardRef(() => StudentsService))
+    private readonly studentService: StudentsService,
   ) {}
 
   async createGroup(dto: CreateGroupDto) {
@@ -24,11 +33,66 @@ export class GroupsService {
   }
 
   async getByType(type: GroupTypes) {
-    return this.groupModel.find({ type }).populate('user').exec();
+    return this.groupModel
+      .aggregate([
+        {
+          $match: {
+            type: type,
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+        // {
+        //   $lookup: {
+        //     from: 'Students',
+        //     localField: 'id',
+        //     foreignField: 'students',
+        //     as: 'students',
+        //   },
+        // },
+        {
+          $lookup: {
+            from: 'User',
+            localField: 'id',
+            foreignField: 'user',
+            as: 'user',
+          },
+        },
+      ])
+      .exec();
   }
 
   async getByTypeFromUser(type: GroupTypes, userid: string) {
-    return this.groupModel.find({ type, user: userid }).populate('user').exec();
+    return this.groupModel
+      .aggregate([
+        {
+          $match: {
+            type: type,
+            user: userid,
+          },
+        },
+        {
+          $sort: { _id: 1 },
+        },
+        // {
+        //   $lookup: {
+        //     from: 'Students',
+        //     localField: 'id',
+        //     foreignField: 'students',
+        //     as: 'students',
+        //   },
+        // },
+        {
+          $lookup: {
+            from: 'User',
+            localField: 'id',
+            foreignField: 'user',
+            as: 'user',
+          },
+        },
+      ])
+      .exec();
   }
 
   async updateGroup(id: string, dto: CreateGroupDto) {
@@ -39,16 +103,36 @@ export class GroupsService {
   }
 
   async deleteGroup(id: string) {
-    return this.groupModel.findByIdAndDelete(id).exec();
+    const group = await this.groupModel.findById(id).exec();
+    const students = group.students.map((el) => el.toString());
+
+    await this.studentService.deleteMany(students);
+    group.remove();
+    return { status: 'ok' };
   }
 
-  async setStudentToGroup(val: number, id: string, student: Types.ObjectId) {
+  async setStudentToGroup(id: string, student: Types.ObjectId) {
     const up = await this.groupModel
       .findByIdAndUpdate(
         id,
         {
-          $inc: { count: val },
+          $inc: { count: -1 },
           $addToSet: { students: student },
+        },
+        { new: true },
+      )
+      .exec();
+
+    return up;
+  }
+
+  async removeStudentToGroup(id: string, student: Types.ObjectId) {
+    const up = await this.groupModel
+      .findByIdAndUpdate(
+        id,
+        {
+          $inc: { count: 1 },
+          $pull: { students: { $in: student } },
         },
         { new: true },
       )

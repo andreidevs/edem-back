@@ -1,8 +1,8 @@
 import { CreatePaymentDto } from './../payments/dto/create-payment.dto';
-import { Types } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 import { ModelType } from '@typegoose/typegoose/lib/types';
 import { StudentModel } from './student.model';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from 'nestjs-typegoose';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -16,6 +16,7 @@ export class StudentsService {
     @InjectModel(StudentModel)
     private readonly studentModel: ModelType<StudentModel>,
     private readonly paymentService: PaymentsService,
+    @Inject(forwardRef(() => GroupsService))
     private readonly groupService: GroupsService,
   ) {}
 
@@ -31,7 +32,6 @@ export class StudentsService {
 
     // Set student to group
     const group = await this.groupService.setStudentToGroup(
-      -1,
       dto.group,
       student._id,
     );
@@ -41,7 +41,7 @@ export class StudentsService {
     if (dto.paid) {
       const type = (await this.groupService.getById(dto.group)).type;
       const payment: CreatePaymentDto = {
-        title: '',
+        title: 'Оплата при создании',
         student: student._id.toString(),
         date: new Date(),
         price: dto.subscription,
@@ -71,7 +71,18 @@ export class StudentsService {
   }
 
   async remove(id: string) {
-    return this.studentModel.findByIdAndDelete(id).exec();
+    const student = await this.studentModel.findById(id).exec();
+    const up = await this.groupService.removeStudentToGroup(
+      student.group.toString(),
+      student._id,
+    );
+
+    student.remove();
+    return { status: 'ok', up };
+  }
+
+  async deleteMany(students: string[]) {
+    return this.studentModel.deleteMany({ _id: { $in: students } }).exec();
   }
 
   async paid(id: string) {

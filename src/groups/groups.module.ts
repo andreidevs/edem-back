@@ -1,9 +1,10 @@
 import { AuthModule } from './../auth/auth.module';
 import { GroupModel } from './group.model';
 import { TypegooseModule } from 'nestjs-typegoose';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { GroupsController } from './groups.controller';
 import { GroupsService } from './groups.service';
+import { StudentsModule } from 'src/students/students.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { GroupsService } from './groups.service';
       },
     ]),
     AuthModule,
+    forwardRef(() => StudentsModule),
   ],
   controllers: [GroupsController],
   providers: [GroupsService],
