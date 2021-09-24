@@ -1,0 +1,122 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int        @id @default(autoincrement())
+  email    String     @unique
+  name     String?
+  roles    Role       @default(COACH)
+  Groups   Groups[]
+  Students Students[]
+  Payments Payments[]
+  Daily    Daily[]
+  Indiv    Indiv[]
+}
+
+model Groups {
+  id            Int         @id @default(autoincrement())
+  time          String
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  weekDays      String[]
+  count         Int
+  type          GroupTypes  @default(GROUP)
+  typeWorkout   TypeWorkout @relation(fields: [typeWorkoutId], references: [id])
+  typeWorkoutId Int
+  Students      Students[]
+  Payments      Payments[]
+  Daily         Daily[]
+}
+
+model Students {
+  id           Int        @id @default(autoincrement())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
+  phone        String
+  group        Groups     @relation(fields: [groupId], references: [id])
+  groupId      Int
+  paid         Boolean    @default(false)
+  paidDate     DateTime
+  subscription Int
+  single       Boolean    @default(false)
+  Payments     Payments[]
+}
+
+model Payments {
+  id        Int             @id @default(autoincrement())
+  student   Students        @relation(fields: [studentId], references: [id])
+  studentId Int
+  group     Groups          @relation(fields: [groupId], references: [id])
+  groupId   Int
+  date      DateTime
+  price     Int
+  coach     User            @relation(fields: [coachId], references: [id])
+  coachId   Int
+  type      TypesActivities
+  Indiv     Indiv?          @relation(fields: [indivId], references: [id])
+  indivId   Int?
+}
+
+model Daily {
+  id      Int             @id @default(autoincrement())
+  coach   User            @relation(fields: [coachId], references: [id])
+  coachId Int
+  date    DateTime
+  type    TypesActivities
+  group   Groups?         @relation(fields: [groupId], references: [id])
+  groupId Int
+  indiv   Indiv           @relation(fields: [indivId], references: [id])
+  indivId Int
+}
+
+model Indiv {
+  id           Int        @id @default(autoincrement())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       Int
+  phone        String
+  paid         Boolean    @default(false)
+  paidDate     DateTime
+  subscription Int
+  Payments     Payments[]
+  Daily        Daily[]
+}
+
+model Expenses {
+  id    Int      @id @default(autoincrement())
+  date  DateTime
+  name  String
+  price Int
+}
+
+model TypeWorkout {
+  id     Int      @id @default(autoincrement())
+  name   String
+  Groups Groups[]
+}
+
+//ENUMS
+enum Role {
+  ADMIN
+  COACH
+}
+
+enum GroupTypes {
+  GROUP
+  MINI
+}
+
+enum TypesActivities {
+  group
+  single
+  mini
+  indiv
+}
