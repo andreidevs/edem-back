@@ -22,11 +22,12 @@ export class UserService {
   }
 
   async getAllUsers() {
-    return await this.userModel.find();
+  
+   return await this.userModel.find({}, {roles: 1, email: 1, name: 1, });
   }
 
   async getUserById(id: string) {
-    return await this.userModel.findById(id);
+    return await this.userModel.findById(id, {roles: 1, email: 1, name: 1, });
   }
 
   async delete(id: string) {

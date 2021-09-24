@@ -41,16 +41,14 @@ export class GroupsService {
           },
         },
         {
-          $sort: { _id: 1 },
+          $lookup: {
+            from: 'Students',
+            localField: 'group',
+            foreignField: 'students',
+           
+            as: 'students',
+          }
         },
-        // {
-        //   $lookup: {
-        //     from: 'Students',
-        //     localField: 'id',
-        //     foreignField: 'students',
-        //     as: 'students',
-        //   },
-        // },
         {
           $lookup: {
             from: 'User',

@@ -22,7 +22,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@admin-bro/mongoose": "^1.1.0",
+    "@admin-bro/mongoose": "^1.0.2",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.0.1",
     "@nestjs/core": "^8.0.0",
@@ -38,7 +38,7 @@
     "@types/fs-extra": "^9.0.12",
     "@types/mongoose": "^5.11.97",
     "@types/sharp": "^0.28.5",
-    "admin-bro": "^4.0.1",
+    "admin-bro": "^3.2.5",
     "admin-bro-expressjs": "^2.1.1",
     "app-root-path": "^3.0.0",
     "bcryptjs": "^2.4.3",
