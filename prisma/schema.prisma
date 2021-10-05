@@ -14,12 +14,15 @@ model User {
   id       Int        @id @default(autoincrement())
   email    String     @unique
   name     String?
-  roles    Role       @default(COACH)
-  Groups   Groups[]
-  Students Students[]
-  Payments Payments[]
-  Daily    Daily[]
-  Indiv    Indiv[]
+  role     Role       @default(COACH)
+  password String
+  groups   Groups[]
+  students Students[]
+  payments Payments[]
+  daily    Daily[]
+  indiv    Indiv[]
+  hall     Hall[]
+
 }
 
 model Groups {
@@ -32,9 +35,11 @@ model Groups {
   type          GroupTypes  @default(GROUP)
   typeWorkout   TypeWorkout @relation(fields: [typeWorkoutId], references: [id])
   typeWorkoutId Int
-  Students      Students[]
-  Payments      Payments[]
-  Daily         Daily[]
+  students      Students[]
+  payments      Payments[]
+  daily         Daily[]
+  hall          Hall        @relation(fields: [hallId], references: [id])
+  hallId        Int
 }
 
 model Students {
@@ -42,13 +47,15 @@ model Students {
   user         User       @relation(fields: [userId], references: [id])
   userId       Int
   phone        String
-  group        Groups     @relation(fields: [groupId], references: [id])
-  groupId      Int
+  group        Groups?    @relation(fields: [groupId], references: [id])
+  groupId      Int?
+  indiv        Indiv?     @relation(fields: [indivId], references: [id])
+  indivId      Int?
   paid         Boolean    @default(false)
-  paidDate     DateTime
+  paidDate     DateTime?
   subscription Int
   single       Boolean    @default(false)
-  Payments     Payments[]
+  payments     Payments[]
 }
 
 model Payments {
@@ -62,8 +69,10 @@ model Payments {
   coach     User            @relation(fields: [coachId], references: [id])
   coachId   Int
   type      TypesActivities
-  Indiv     Indiv?          @relation(fields: [indivId], references: [id])
+  indiv     Indiv?          @relation(fields: [indivId], references: [id])
   indivId   Int?
+  hall      Hall?           @relation(fields: [hallId], references: [id])
+  hallId    Int?
 }
 
 model Daily {
@@ -73,9 +82,9 @@ model Daily {
   date    DateTime
   type    TypesActivities
   group   Groups?         @relation(fields: [groupId], references: [id])
-  groupId Int
-  indiv   Indiv           @relation(fields: [indivId], references: [id])
-  indivId Int
+  groupId Int?
+  indiv   Indiv?          @relation(fields: [indivId], references: [id])
+  indivId Int?
 }
 
 model Indiv {
@@ -86,21 +95,38 @@ model Indiv {
   paid         Boolean    @default(false)
   paidDate     DateTime
   subscription Int
-  Payments     Payments[]
-  Daily        Daily[]
+  payments     Payments[]
+  daily        Daily[]
+  hall         Hall       @relation(fields: [hallId], references: [id])
+  hallId       Int
+  students     Students[]
 }
 
 model Expenses {
-  id    Int      @id @default(autoincrement())
-  date  DateTime
-  name  String
-  price Int
+  id     Int      @id @default(autoincrement())
+  date   DateTime
+  name   String
+  price  Int
+  hall   Hall?    @relation(fields: [hallId], references: [id])
+  hallId Int?
 }
 
 model TypeWorkout {
   id     Int      @id @default(autoincrement())
   name   String
-  Groups Groups[]
+  code   String
+  groups Groups[]
+}
+
+model Hall {
+  id       Int        @id @default(autoincrement())
+  name     String
+  code     String
+  groups   Groups[]
+  user     User[]
+  payments Payments[]
+  indiv    Indiv[]
+  expenses Expenses[]
 }
 
 //ENUMS
