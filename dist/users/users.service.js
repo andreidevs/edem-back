@@ -24,25 +24,25 @@ let UsersService = class UsersService {
     }
     async getAll() {
         return this.prisma.user.findMany({
-            select: SelectedFields
+            select: SelectedFields,
         });
     }
     async getById(id) {
         return this.prisma.user.findUnique({
             where: { id },
-            select: SelectedFields
+            select: SelectedFields,
         });
     }
     async update(id, data) {
         return this.prisma.user.update({
             where: { id },
             data,
-            select: SelectedFields
+            select: SelectedFields,
         });
     }
     async delete(id) {
         return this.prisma.user.delete({
-            where: { id }
+            where: { id },
         });
     }
 };

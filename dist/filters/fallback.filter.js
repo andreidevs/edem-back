@@ -10,13 +10,14 @@ exports.FallbackExceptionFilter = void 0;
 const common_1 = require("@nestjs/common");
 let FallbackExceptionFilter = class FallbackExceptionFilter {
     catch(exception, host) {
-        console.log("fallback exception handler triggered", JSON.stringify(exception));
+        console.log('fallback exception handler triggered', JSON.stringify(exception));
         const ctx = host.switchToHttp(), response = ctx.getResponse();
         return response.status(500).json({
             statusCode: 500,
-            createdBy: "FallbackExceptionFilter",
-            errorMessage: exception.message ? exception.message :
-                'Произошла непредвиденная ошибка'
+            createdBy: 'FallbackExceptionFilter',
+            errorMessage: exception.message
+                ? exception.message
+                : 'Произошла непредвиденная ошибка',
         });
     }
 };

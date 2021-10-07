@@ -22,17 +22,15 @@ export class JwtAuthGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = context.switchToHttp().getRequest();
     try {
-      const authHeader = req.headers.authorization;
-      const bearer = authHeader.split(' ')[0];
-      const token = authHeader.split(' ')[1];
+      const cookie = req.cookies[process.env.JWT_COOKIE_NAME];
 
-      if (bearer !== 'Bearer' || !token) {
+      const user = this.jwtService.verify(cookie);
+      if (!user) {
         throw new UnauthorizedException({
           message: 'Пользователь не авторизован',
         });
       }
 
-      const user = this.jwtService.verify(token);
       req.user = user;
       return true;
     } catch (e) {

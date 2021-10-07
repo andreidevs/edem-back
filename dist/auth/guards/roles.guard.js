@@ -26,16 +26,14 @@ let RolesGuard = class RolesGuard {
                 return true;
             }
             const req = context.switchToHttp().getRequest();
-            const authHeader = req.headers.authorization;
-            const bearer = authHeader.split(' ')[0];
-            const token = authHeader.split(' ')[1];
-            if (bearer !== 'Bearer' || !token) {
+            const cookie = req.cookies[process.env.JWT_COOKIE_NAME];
+            const user = this.jwtService.verify(cookie);
+            if (!user) {
                 throw new common_1.UnauthorizedException({
                     message: 'Пользователь не авторизован',
                 });
             }
-            const user = this.jwtService.verify(token);
-            return user.roles.some((role) => requiredRoles.includes(role));
+            return user.role.some((role) => requiredRoles.includes(role));
         }
         catch (e) {
             console.log(e);

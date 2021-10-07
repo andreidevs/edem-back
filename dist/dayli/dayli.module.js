@@ -15,7 +15,7 @@ let DayliModule = class DayliModule {
 DayliModule = __decorate([
     (0, common_1.Module)({
         controllers: [dayli_controller_1.DayliController],
-        providers: [dayli_service_1.DayliService]
+        providers: [dayli_service_1.DayliService],
     })
 ], DayliModule);
 exports.DayliModule = DayliModule;

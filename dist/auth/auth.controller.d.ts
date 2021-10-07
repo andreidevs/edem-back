@@ -1,4 +1,4 @@
-import { JwtService } from "@nestjs/jwt";
+import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { Prisma } from '.prisma/client';

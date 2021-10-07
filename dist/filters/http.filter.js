@@ -10,13 +10,13 @@ exports.HttpExceptionFilter = void 0;
 const common_1 = require("@nestjs/common");
 let HttpExceptionFilter = class HttpExceptionFilter {
     catch(exception, host) {
-        console.log("HTTP exception handler triggered", JSON.stringify(exception));
+        console.log('HTTP exception handler triggered', JSON.stringify(exception));
         const ctx = host.switchToHttp();
         const response = ctx.getResponse(), request = ctx.getRequest(), statusCode = exception.getStatus();
         return response.status(statusCode).json({
             status: statusCode,
-            createdBy: "HttpExceptionFilter",
-            errorMessage: exception.message
+            createdBy: 'HttpExceptionFilter',
+            errorMessage: exception.message,
         });
     }
 };

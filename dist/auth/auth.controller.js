@@ -39,7 +39,7 @@ let AuthController = class AuthController {
         const user = await this.authService.create({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
         });
         delete user.password;
         return user;
@@ -49,18 +49,19 @@ let AuthController = class AuthController {
         if (!user) {
             throw new common_1.BadRequestException('invalid credentials');
         }
-        if (!await bcrypt.compare(password, user.password)) {
+        if (!(await bcrypt.compare(password, user.password))) {
             throw new common_1.BadRequestException('invalid credentials');
         }
-        const jwt = await this.jwtService.signAsync({ id: user.id });
-        response.cookie('jwt', jwt, { httpOnly: true });
+        delete user.password;
+        const jwt = await this.jwtService.signAsync(user);
+        response.cookie(process.env.JWT_COOKIE_NAME, jwt, { httpOnly: true });
         return {
-            message: 'success'
+            message: 'success',
         };
     }
     async user(request) {
         try {
-            const cookie = request.cookies['jwt'];
+            const cookie = request.cookies[process.env.JWT_COOKIE_NAME];
             const data = await this.jwtService.verifyAsync(cookie);
             if (!data) {
                 throw new common_1.UnauthorizedException();
@@ -74,9 +75,9 @@ let AuthController = class AuthController {
         }
     }
     async logout(response) {
-        response.clearCookie('jwt');
+        response.clearCookie(process.env.JWT_COOKIE_NAME);
         return {
-            message: 'success'
+            message: 'success',
         };
     }
 };
@@ -104,6 +105,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "user", null);
 __decorate([
+    (0, common_1.HttpCode)(200),
     (0, common_1.Post)('logout'),
     __param(0, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),

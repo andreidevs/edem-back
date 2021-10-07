@@ -14,8 +14,8 @@ let ValidationFilter = class ValidationFilter {
         const ctx = host.switchToHttp(), response = ctx.getResponse();
         return response.status(400).json({
             statusCode: 400,
-            createdBy: "ValidationFilter",
-            messages: exception.validationErrors
+            createdBy: 'ValidationFilter',
+            messages: exception.validationErrors,
         });
     }
 };

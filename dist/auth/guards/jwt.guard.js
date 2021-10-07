@@ -19,15 +19,13 @@ let JwtAuthGuard = class JwtAuthGuard {
     canActivate(context) {
         const req = context.switchToHttp().getRequest();
         try {
-            const authHeader = req.headers.authorization;
-            const bearer = authHeader.split(' ')[0];
-            const token = authHeader.split(' ')[1];
-            if (bearer !== 'Bearer' || !token) {
+            const cookie = req.cookies[process.env.JWT_COOKIE_NAME];
+            const user = this.jwtService.verify(cookie);
+            if (!user) {
                 throw new common_1.UnauthorizedException({
                     message: 'Пользователь не авторизован',
                 });
             }
-            const user = this.jwtService.verify(token);
             req.user = user;
             return true;
         }

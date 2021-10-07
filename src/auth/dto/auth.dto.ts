@@ -1,11 +1,10 @@
 import { IsString, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export enum UserRoles{
+export enum UserRoles {
   ADMIN,
-  COACH
+  COACH,
 }
-
 
 export class AuthDto {
   @ApiProperty({ example: 'asd@test.ru', description: 'Email' })
@@ -24,9 +23,6 @@ export class AuthDto {
     example: '237fyo23iffiweifj',
     description: 'Присовить роль из модели roles',
   })
-
   @IsEnum(UserRoles)
   role?: UserRoles;
-
 }
-

@@ -22,9 +22,11 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe({
         skipMissingProperties: true,
         exceptionFactory: (errors) => {
-            const messages = errors.map(error => `${error.property} имеет неверное значение ${error.value}, ${typeof (error.constraints) === "object" ? Object.values(error.constraints).join(', ') : ""} `);
+            const messages = errors.map((error) => `${error.property} имеет неверное значение ${error.value}, ${typeof error.constraints === 'object'
+                ? Object.values(error.constraints).join(', ')
+                : ''} `);
             return new validation_exception_1.ValidationException(messages);
-        }
+        },
     }));
     app.use(cookieParser());
     app.setGlobalPrefix('api');

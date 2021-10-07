@@ -7,38 +7,36 @@ const SelectedFields = {
   name: true,
   email: true,
   role: true,
-
-}
+};
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getAll(){
+  async getAll() {
     return this.prisma.user.findMany({
-      select: SelectedFields
-    })
+      select: SelectedFields,
+    });
   }
 
-  async getById(id: number){
+  async getById(id: number) {
     return this.prisma.user.findUnique({
-      where: {id},
-      select: SelectedFields
-    })
+      where: { id },
+      select: SelectedFields,
+    });
   }
 
-  async update(id: number, data: Prisma.UserUpdateInput){
+  async update(id: number, data: Prisma.UserUpdateInput) {
     return this.prisma.user.update({
-      where: {id},
+      where: { id },
       data,
-      select: SelectedFields
-    })
+      select: SelectedFields,
+    });
   }
 
-  async delete(id: number){
+  async delete(id: number) {
     return this.prisma.user.delete({
-      where: {id}
-    })
+      where: { id },
+    });
   }
-
 }

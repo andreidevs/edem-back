@@ -1,85 +1,98 @@
-import {BadRequestException, Body, Controller, Delete, Get, HttpCode, Post, Req, Res, UnauthorizedException} from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import {JwtService} from "@nestjs/jwt";
-import {Response, Request} from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { Prisma } from '.prisma/client';
 
 @Controller('auth')
 export class AuthController {
-    constructor(
-        private readonly authService: AuthService,
-        private jwtService: JwtService
-    ) {
+  constructor(
+    private readonly authService: AuthService,
+    private jwtService: JwtService,
+  ) {}
+
+  @Post('register')
+  async register(@Body() { name, email, password }: Prisma.UserCreateInput) {
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = await this.authService.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    delete user.password;
+
+    return user;
+  }
+
+  @HttpCode(200)
+  @Post('login')
+  async login(
+    @Body() { email, password }: Prisma.UserCreateInput,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const user = await this.authService.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('invalid credentials');
     }
 
-    @Post('register')
-    async register(@Body() {name, email, password}: Prisma.UserCreateInput) {
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const user = await this.authService.create({
-            name,
-            email,
-            password: hashedPassword
-        });
-
-        delete user.password;
-
-        return user;
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('invalid credentials');
     }
 
-    @HttpCode(200)
-    @Post('login')
-    async login(
-      @Body() {email, password}: Prisma.UserCreateInput,
-        @Res({passthrough: true}) response: Response
-    ) {
-        const user = await this.authService.findByEmail(email);
+    delete user.password;
 
-        if (!user) {
-            throw new BadRequestException('invalid credentials');
-        }
+    const jwt = await this.jwtService.signAsync(user);
 
-        if (!await bcrypt.compare(password, user.password)) {
-            throw new BadRequestException('invalid credentials');
-        }
+    response.cookie(process.env.JWT_COOKIE_NAME, jwt, { httpOnly: true });
 
-        const jwt = await this.jwtService.signAsync({id: user.id});
+    return {
+      message: 'success',
+    };
+  }
 
-        response.cookie('jwt', jwt, {httpOnly: true});
+  @Get('user')
+  async user(@Req() request: Request) {
+    try {
+      const cookie = request.cookies[process.env.JWT_COOKIE_NAME];
 
-        return {
-            message: 'success'
-        };
+      const data = await this.jwtService.verifyAsync(cookie);
+
+      if (!data) {
+        throw new UnauthorizedException();
+      }
+
+      const user = await this.authService.findById(data['id']);
+
+      const { password, ...result } = user;
+
+      return result;
+    } catch (e) {
+      throw new UnauthorizedException();
     }
+  }
 
-    @Get('user')
-    async user(@Req() request: Request) {
-        try {
-            const cookie = request.cookies['jwt'];
+  @HttpCode(200)
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie(process.env.JWT_COOKIE_NAME);
 
-            const data = await this.jwtService.verifyAsync(cookie);
-
-            if (!data) {
-                throw new UnauthorizedException();
-            }
-
-            const user = await this.authService.findById(data['id']);
-
-            const {password, ...result} = user;
-
-            return result;
-        } catch (e) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    @Post('logout')
-    async logout(@Res({passthrough: true}) response: Response) {
-        response.clearCookie('jwt');
-
-        return {
-            message: 'success'
-        }
-    }
+    return {
+      message: 'success',
+    };
+  }
 }

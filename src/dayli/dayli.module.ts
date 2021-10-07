@@ -4,6 +4,6 @@ import { DayliController } from './dayli.controller';
 
 @Module({
   controllers: [DayliController],
-  providers: [DayliService]
+  providers: [DayliService],
 })
 export class DayliModule {}

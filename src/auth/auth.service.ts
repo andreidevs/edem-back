@@ -9,26 +9,28 @@ import { Prisma } from '.prisma/client';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: Prisma.UserCreateInput) {
-   return this.prisma.user.create({
-     data: dto
-   })
+    return this.prisma.user.create({
+      data: dto,
+    });
   }
 
-  async findById(id: number){
+  async findById(id: number) {
     return this.prisma.user.findUnique({
-      where: {id}
-    })
+      where: { id },
+    });
   }
 
-  async findByEmail(email: string){
+  async findByEmail(email: string) {
     return this.prisma.user.findUnique({
-      where: {email}
-    })
+      where: { email },
+    });
+  }
+
+  checkRole(role: string, user: Prisma.UserUncheckedCreateInput): Boolean {
+    if (role === user.role) return true;
+    else return false;
   }
 }
