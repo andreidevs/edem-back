@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("./../prisma/prisma.service");
 const include = {
     hall: true,
+    students: true,
     user: {
         select: {
             id: true,

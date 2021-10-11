@@ -5,6 +5,7 @@ import { GroupTypes } from './group.types';
 
 const include = {
   hall: true,
+  students: true,
   user: {
     select: {
       id: true,

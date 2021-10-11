@@ -4,20 +4,20 @@ export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
     getAll(): Promise<{
-        name: string;
         id: number;
+        name: string;
         email: string;
         role: import(".prisma/client").Role;
     }[]>;
     getById(id: number): Promise<{
-        name: string;
         id: number;
+        name: string;
         email: string;
         role: import(".prisma/client").Role;
     }>;
     update(id: number, data: Prisma.UserUpdateInput): Promise<{
-        name: string;
         id: number;
+        name: string;
         email: string;
         role: import(".prisma/client").Role;
     }>;

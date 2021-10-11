@@ -95,4 +95,10 @@ export class AuthController {
       message: 'success',
     };
   }
+
+
+  @Post('clearDatabse')
+  async clearDatabase(){
+    return this.authService.clearDataBase()
+  }
 }
